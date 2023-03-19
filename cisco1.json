@@ -1,0 +1,18 @@
+{
+ "router": [
+  {
+     "host_ip": "192.168.103.69",
+     "hostname": "COREtaasniJSON1",
+	 "username": "admin",
+	 "password": "password",
+     "lo_interfaces": ["11.1.1.1","22.2.2.2","33.3.3.3"]
+  },
+   {
+     "host_ip": "10.12.1.4",
+     "hostname": "COREbabaniJSON2",
+	 "username": "admin",
+	 "password": "password",
+     "lo_interfaces": ["44.4.4.4","55.5.5.5","66.6.6.6"]
+  }
+ ]
+}

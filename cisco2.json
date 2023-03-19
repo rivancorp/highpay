@@ -1,0 +1,11 @@
+{
+ "router": [
+  {
+     "host_ip": "192.168.103.69",
+     "hostname": "CiscoAuto2",
+	 "username": "admin",
+	 "password": "password",
+     "lo_interfaces": ["1.1.1.1","2.2.2.2","3.3.3.3"]
+  }
+ ]
+}

@@ -1,0 +1,15 @@
+{
+    "autoap": {
+        "host": "10.1.1.3",
+        "hostname": "23AutonoAP",
+        "username": "admin",
+        "password": "password",
+        "enpass": "pass",
+        "ssid": "23-wifiautoSSID",
+        "authen": "open",
+        "keyman": "wpa",
+        "wifipass": "C1sc0123",
+        "channl": "9",
+        "encmod": "tkip"
+    }
+ }
