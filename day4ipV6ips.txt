@@ -71,28 +71,28 @@ IPV6 ADDRESSING FOR THE ISP'S
 	conf t
 	ipv6 unicast-routing
 	int lo1
-		ipv6 add b44::1/128
-		router bgp 45
-			neigh b:1:4:b::5 remote-as 45
-			neigh b:2:1:b::2 remote-as 2
-			neigh b:1:11:b::1 remote-as 1
-			address-family ipv6
-				neigh b:1:4:b::5 activate
-				neigh b:2:1:b::2 activate
-				neigh b:1:11:b::1 activate
-				network b:1:4:b::/64
-				network b:2:1:b::/64
-				network b:1:11:b::/64
-				network b44::1/128
-				end
+	ipv6 add b44::1/128
+	router bgp 450
+	neigh b:1:4:b::5 remote-as 450
+	neigh b:2:1:b::2 remote-as 200
+	neigh b:1:11:b::1 remote-as 100
+	address-family ipv6
+		neigh b:1:4:b::5 activate
+		neigh b:2:1:b::2 activate
+		neigh b:1:11:b::1 activate
+		network b:1:4:b::/64
+		network b:2:1:b::/64
+		network b:1:11:b::/64
+		network b44::1/128
+		end
 				
 @R1
 	conf t
 		ipv6 unicast-routing
-		router bgp 1
-			neigh b:1:33:b::3 remote-as 3
-			neigh b:1:22:b::2 remote-as 2
-			neigh b:1:11:b::4 remote-as 45
+		router bgp 100
+			neigh b:1:33:b::3 remote-as 300
+			neigh b:1:22:b::2 remote-as 200
+			neigh b:1:11:b::4 remote-as 450
 			address-family ipv6
 				neigh b:1:33:b::3 activate
 				neigh b:1:22:b::2 activate
@@ -252,7 +252,7 @@ IPV6 ADDRESSING FOR THE ISP'S
 		
 		ipv6 unicast-routing
 		int e0/0
-		shutdown
+		no shutdown
 		ipv6 en
 		ipv6 add 10:2:1:12::B00B/64
 		end
@@ -271,7 +271,9 @@ IPV6 ADDRESSING FOR THE ISP'S
 	ipv6 unicast-routing
 	ipv6 route ::/0 10:2:1:12::2
 	int e1/0
-		ipv6 address 10:2:1:12::/64 eui-64
+		ipv6 address autoconfig
+		ipv6 address aa:bbb:ccc:ddd::/64 eui-64
+		ipv6 address 10:2:1:12::baab/64
 		end
 	ping 10:2:1:12::2
 	show ipv6 int brief
