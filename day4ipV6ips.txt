@@ -1,0 +1,280 @@
+@@@@@IPVV6@@@@@@@@@@
+######################################################################
+
+conf t
+alias exec bp6 show ipv6 int brief | exc down
+alias exec sr6 show ipv6 route
+alias exec sc show run | sec
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~IPV6~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+IPV6 ADDRESSING FOR THE ISP'S
+@ISP4
+	conf t
+		ipv6 unicast-routing
+		int e0/1
+			ipv6 add b:1:4:b::5/64
+		int e0/2
+			ipv6 add b:2:4:b::5/64
+		int e0/3
+			ipv6 add b:3:4:b::5/64
+			end
+
+@ISP3
+	config t
+		ipv6 unicast-routing
+		int e1/1
+			ipv6 add b:3:4:b::3/64
+		int e1/2
+			ipv6 add b:1:2:b::3/64
+		int e1/3
+			ipv6 add b:1:33:b::3/64
+			end
+			
+@ISP2
+	config t
+		ipv6 unicast-routing
+		int e0/2
+			ipv6 add b:2:4:b::2/64
+		int e1/1
+			ipv6 add b:2:1:b::2/64
+		int e1/3
+			ipv6 add b:1:22:b::2/64
+		int e1/2
+			ipv6 add b:1:2:b::2/64
+			end
+
+@ISP1
+	config t
+		ipv6 unicast-routing
+		int e1/2
+			ipv6 add b:1:4:b::4/64
+		int e1/1
+			ipv6 add b:2:1:b::4/64
+		int e1/3
+			ipv6 add b:1:11:b::4/64
+			end
+
+@R1
+	config t
+		ipv6 unicast-routing
+		int e1/3
+			ipv6 add b:1:33:b::1/64
+		int e1/2
+			ipv6 add b:1:22:b::1/64
+		int e1/1
+			ipv6 add b:1:11:b::1/64
+			end
+                ###################
+				~~~~~~~~~~~~~~~~~~~~~~~~~IPV6 BGP Configuration~~~~~~
+
+@ISP1
+	conf t
+	ipv6 unicast-routing
+	int lo1
+		ipv6 add b44::1/128
+		router bgp 45
+			neigh b:1:4:b::5 remote-as 45
+			neigh b:2:1:b::2 remote-as 2
+			neigh b:1:11:b::1 remote-as 1
+			address-family ipv6
+				neigh b:1:4:b::5 activate
+				neigh b:2:1:b::2 activate
+				neigh b:1:11:b::1 activate
+				network b:1:4:b::/64
+				network b:2:1:b::/64
+				network b:1:11:b::/64
+				network b44::1/128
+				end
+				
+@R1
+	conf t
+		ipv6 unicast-routing
+		router bgp 1
+			neigh b:1:33:b::3 remote-as 3
+			neigh b:1:22:b::2 remote-as 2
+			neigh b:1:11:b::4 remote-as 45
+			address-family ipv6
+				neigh b:1:33:b::3 activate
+				neigh b:1:22:b::2 activate
+				neigh b:1:11:b::4 activate
+				network FEC0:1::/122
+				network b:1:33:b::/64
+				network b:1:22:b::/64
+				network b:1:11:b::/64
+				end
+
+@@@@@@@@@@@
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Configure ipv6 address on the ospf AREA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~
+@R1
+	conf t
+		ipv6 unicast-routing
+		interface Loopback1
+			description Test I/F for BGP, OSPFv2 & OSPFv3 Routing
+			ip address 1.1.1.1 255.255.255.255
+			ipv6 address FEC0:1::1/122
+		int e1/0
+			ipv6 address 2026::12:1/122
+			end
+
+@R2
+	conf t
+		ipv6 unicast-routing
+		interface Loopback2
+			description Test I/F for OSPFv2 & OSPFv3 Routing
+			ip address 2.2.2.2 255.255.255.255
+			ipv6 address FEC0:2::2/122
+		int e1/2
+			ipv6 address 2026::12:2/122
+		int e1/1
+			ipv6 address 2026::1:1/122
+			end
+
+@R3
+	conf t
+		ipv6 unicast-routing
+		interface Loopback3
+			description Test I/F for OSPFv2 & OSPFv3 Routing
+			ip address 3.3.3.3 255.255.255.255
+			ipv6 address FEC0:3::3/122
+		interface Tunnel34
+			no ip address
+			ipv6 address 2026::34:1/122
+			tunnel source lo3
+			tunnel destination 4.4.4.4
+			tunnel mode ipv6ip
+		int e1/1
+			ipv6 address 2026::1:2/122
+			end
+
+@R4
+	conf t
+		ipv6 unicast-routing
+		interface Loopback4
+			description Test I/F for OSPFv2 & OSPFv3 Routing
+			ip address 4.4.4.4 255.255.255.255
+			ipv6 address FEC0::4:4/122
+		interface e1/0
+			description L3 Link to DSW1
+			ip address 10.1.4.5 255.255.255.252
+			ipv6 address 2026::2:1/122 
+		interface e1/1
+			description L3 Link to DSW2 fa0/14
+			ip address 10.1.4.9 255.255.255.252
+		interface Loopback14
+			description Test I/F for RIPng Routing
+			no ip address
+			ipv6 address FEC0::14:4/122
+		interface Loopback21
+			description Test I/F for EIGRPv4 Routing & IP(v4) Helper Loopback I/F
+			ip address 10.1.21.129 255.255.255.224
+		interface Tunnel34
+	    !creating a tunnel for the ipv6 connection of router 3 and router 4
+			no ip address
+			ipv6 address 2026::34:2/122
+			tunnel source lo4
+			tunnel destination 3.3.3.3
+			tunnel mode ipv6ip
+			end
+			
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			end
+
+####################################################################################################
+~~~~~~~~~~~~~~~~~~~~~~~CONFIGURE INTERNAL NETWORK  IPV6 ADDRESSING~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+@R4
+	config t
+		int e 1/0
+			ipv6 add 10:1:4:14::4/64
+		int e 1/1
+			ipv6 add 10:1:4:24::4/64
+			end
+
+@D1
+	conf t
+		ipv6 unicast-routing
+		interface Loopback1
+			description IPv4, IPv6 & RIPng Test I/F
+			ip address 11.11.11.11 255.255.255.255
+			ipv6 add 11:11:11:11::1/128
+			ipv6 address FEC0::11:1/122
+		interface e1/1
+			description L3 UpLink to R4
+			no switchport
+			ip address 10.1.4.6 255.255.255.252
+			ipv6 address 2026::2:2/122
+			ipv6 add 10:1:4:14::1/64
+		interface vlan 200
+			description IPv6 Link to DSW2
+			ipv6 address 2026::3:1/122
+			ipv6 add 192:168:1:1234::1/64
+		int vlan 10
+			ipv6 add 10:2:1:12::1/64
+		int vlan 20
+			ipv6 add 10:2:2:12::1/64
+			end
+@D2
+	conf t
+		ipv6 unicast-routing
+		interface Loopback2
+			description IPv4, IPv6 & RIPng Test I/F
+			ip address 22.22.22.22 255.255.255.255
+			ipv6 add 22:22:22:22::2/128
+			ipv6 address FEC0::22:2/122
+		int e 1/1
+			ipv6 add 10:1:4:24::2/64
+		interface vlan 200
+			description IPv6 Link to DSW1
+			ipv6 address 2026::3:2/122
+			ipv6 add 192:168:1:1234::2/64
+		int vlan 10
+			ipv6 add 10:2:1:12::2/64
+		int vlan 20
+			ipv6 add 10:2:2:12::2/64
+			end
+####################################################################################################
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~END DEVICES CONFIGURATION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+#Moving On
+@A1
+	cn
+	show run int e0/0
+	
+@A2
+	cn
+	show run int e0/0
+	
+@P1
+	conf t
+		
+		ipv6 unicast-routing
+		int e0/0
+		shutdown
+		ipv6 en
+		ipv6 add 10:2:1:12::B00B/64
+		end
+	ping 10:1:12:B00B
+	ping 10:2:1:12::2
+	conf t
+		ipv6 unicast-routing
+		int e0/0
+		ipv6 add autoconfig
+		end
+	ping 10:2:1:12::2
+	show ipv6 int brief
+	
+@P2
+	config t
+	ipv6 unicast-routing
+	ipv6 route ::/0 10:2:1:12::2
+	int e1/0
+		ipv6 address 10:2:1:12::/64 eui-64
+		end
+	ping 10:2:1:12::2
+	show ipv6 int brief
+	show ipv6 int brief
+
+			
